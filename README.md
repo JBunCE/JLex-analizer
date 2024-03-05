@@ -8,7 +8,7 @@
 
 ## Lang examples
 
-![image](https://github.com/JBunCE/JLex-analizer/assets/62081821/9e260beb-656a-4322-a52f-261fa1b62c74)
+![image](https://github.com/JBunCE/JLex-analizer/assets/62081821/30ed28ba-8b99-4816-ba93-502d9348b2de)
 
 ## Program execution
 
