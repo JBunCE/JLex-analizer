@@ -13,6 +13,11 @@
                 <MenuItem onAction="#openFolder" text="Open folder" />
                 <MenuItem text="Save" />
             </Menu>
+         <Menu mnemonicParsing="false" text="compile">
+           <items>
+             <MenuItem mnemonicParsing="false" onAction="#build" text="build" />
+           </items>
+         </Menu>
         </MenuBar>
     </top>
     <center>
@@ -24,7 +29,7 @@
             </HBox>
             <VirtualizedScrollPane fx:id="codeScrollPane" VBox.vgrow="ALWAYS">
                 <content>
-                    <CodeArea onKeyReleased="#onCodeAreaChange" fx:id="codeArea" />
+                    <CodeArea fx:id="codeArea" onKeyReleased="#onCodeAreaChange" />
                 </content>
             </VirtualizedScrollPane>
         </VBox>

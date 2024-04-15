@@ -1,0 +1,1 @@
+let 	colita = 20;for(let 	x=0; x <colita;x++){console.log("hello")}

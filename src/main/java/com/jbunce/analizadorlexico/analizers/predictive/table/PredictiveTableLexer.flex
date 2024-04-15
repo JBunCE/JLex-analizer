@@ -8,7 +8,8 @@ import com.jbunce.analizadorlexico.analizers.Tokens;
 
 L=[a-zA-Z]
 D=[0-9]+
-space=[\t \r]+
+space=[\t \r \n]+
+console=(console\.log\(\"hello\"\))
 
 %{
     public String lexeme;
@@ -23,6 +24,7 @@ to { lexeme = yytext(); return Tokens.TO; }
 
 {space} { /* ignore */ }
 "//".* { /* ignore */ }
+{console} { /* ignore */ }
 
 "true" | "false" { lexeme = yytext(); return Tokens.BOOLEAN; }
 "int" | "float" | "string" | "bool" { lexeme = yytext(); return Tokens.TYPE; }

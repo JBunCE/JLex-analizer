@@ -1,10 +1,13 @@
 package com.jbunce.analizadorlexico.controllers;
 
 import ch.qos.logback.classic.Logger;
-import com.jbunce.analizadorlexico.analizers.lexical.Analizer;
+import com.jbunce.analizadorlexico.analizers.lexical.Analyzer;
 import com.jbunce.analizadorlexico.analizers.lexical.Lexer;
 import com.jbunce.analizadorlexico.analizers.predictive.table.LexerTable;
 import com.jbunce.analizadorlexico.analizers.predictive.table.PredictiveTableAlg;
+import com.jbunce.analizadorlexico.analizers.semantic.SemanticAnalyzer;
+import com.jbunce.analizadorlexico.analizers.semantic.SemanticLexer;
+import com.jbunce.analizadorlexico.analizers.semantic.SemanticToken;
 import com.jbunce.analizadorlexico.logger.TextFlowAppender;
 import com.jbunce.analizadorlexico.utils.AlertFactory;
 import javafx.application.Platform;
@@ -29,6 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
@@ -67,9 +73,10 @@ public class HelloController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         String lexerPath = "src/main/java/com/jbunce/analizadorlexico/analizers/lexical/Lexer.flex";
         String tableLexerPath = "src/main/java/com/jbunce/analizadorlexico/analizers/predictive/table/PredictiveTableLexer.flex";
+        String semanticLexerPath = "src/main/java/com/jbunce/analizadorlexico/analizers/semantic/SemanticLexer.flex";
 
         try {
-            generateAnalyzer(lexerPath, tableLexerPath);
+            generateAnalyzer(lexerPath, tableLexerPath, semanticLexerPath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -93,6 +100,36 @@ public class HelloController implements Initializable {
     }
 
     @FXML
+    protected void build() throws FileNotFoundException {
+        Reader semanticLector = new BufferedReader(new FileReader(folderPath + "/" + selectedFile));
+        SemanticLexer semanticLexer = new SemanticLexer(semanticLector);
+        SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+
+        EXECUTOR.execute(() -> {
+            while (true) {
+                try {
+                    SemanticToken token = semanticLexer.yylex();
+
+                    if (token != null) {
+                        semanticAnalyzer.parse(token);
+                    } else {
+                        break;
+                    }
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            try (Context context = Context.create()) {
+                Value value = context.eval(Source.newBuilder("js", new File("src/main/java/com/jbunce/analizadorlexico/analizers/semantic/main.js")).build());
+                log.info(value.asString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @FXML
     protected void onCodeAreaChange() throws FileNotFoundException {
         Platform.runLater(() -> logArea.getChildren().clear());
         String content = codeArea.getText();
@@ -109,11 +146,10 @@ public class HelloController implements Initializable {
         Reader tableLector = new BufferedReader(new FileReader(folderPath + "/" + selectedFile));
         LexerTable lexer2 = new LexerTable(tableLector);
         AtomicReference<String> result = new AtomicReference<>("");
-
         PredictiveTableAlg predictiveTableAlg = new PredictiveTableAlg();
 
         EXECUTOR.execute(() -> {
-            Analizer.analize(infoArea, lexer);
+            Analyzer.analize(infoArea, lexer);
             predictiveTableAlg.parse(lexer2, result, logArea);
         });
     }
@@ -199,8 +235,9 @@ public class HelloController implements Initializable {
         return label;
     }
 
-    private void generateAnalyzer(String lexerPath, String tableLexerPath)throws Exception {
+    private void generateAnalyzer(String lexerPath, String tableLexerPath, String semantic)throws Exception {
         jflex.Main.generate(new String[]{lexerPath});
         jflex.Main.generate(new String[]{tableLexerPath});
+        jflex.Main.generate(new String[]{semantic});
     }
 }

@@ -14,6 +14,7 @@ module com.jbunce.analizadorlexico {
     requires ch.qos.logback.core;
     requires org.slf4j;
     requires jflex;
+    requires org.graalvm.sdk;
 
     opens com.jbunce.analizadorlexico to javafx.fxml;
 

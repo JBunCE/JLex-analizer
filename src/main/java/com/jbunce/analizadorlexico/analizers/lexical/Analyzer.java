@@ -8,7 +8,7 @@ import javafx.scene.text.TextFlow;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Analizer {
+public class Analyzer {
 
     public static void analize(TextFlow logArea, Lexer lexer) {
         AtomicReference<String> result = new AtomicReference<>("");
