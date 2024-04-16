@@ -8,6 +8,7 @@ import com.jbunce.analizadorlexico.analizers.predictive.table.PredictiveTableAlg
 import com.jbunce.analizadorlexico.analizers.semantic.SemanticAnalyzer;
 import com.jbunce.analizadorlexico.analizers.semantic.SemanticLexer;
 import com.jbunce.analizadorlexico.analizers.semantic.SemanticToken;
+import com.jbunce.analizadorlexico.logger.Console;
 import com.jbunce.analizadorlexico.logger.TextFlowAppender;
 import com.jbunce.analizadorlexico.utils.AlertFactory;
 import javafx.application.Platform;
@@ -38,10 +39,12 @@ import org.graalvm.polyglot.Value;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
@@ -97,6 +100,11 @@ public class HelloController implements Initializable {
         });
 
         folderPath = System.getProperty("user.home") + "/Desktop";
+
+        System.setOut(createLoggingProxy(System.out));
+        System.setErr(createLoggingProxy(System.err));
+
+        System.out.println("This will be logged!");
     }
 
     @FXML
@@ -105,7 +113,19 @@ public class HelloController implements Initializable {
         SemanticLexer semanticLexer = new SemanticLexer(semanticLector);
         SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
 
+        // Crear un flujo de salida para capturar la salida de la consola
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+
+        // Guardar el flujo de salida original
+        PrintStream old = System.out;
+
+        // Redirigir la salida estándar al flujo de salida personalizado
+        System.setOut(ps);
+
         EXECUTOR.execute(() -> {
+            System.setOut(createLoggingProxy(System.out));
+            System.setErr(createLoggingProxy(System.err));
             while (true) {
                 try {
                     SemanticToken token = semanticLexer.yylex();
@@ -122,7 +142,15 @@ public class HelloController implements Initializable {
             }
             try (Context context = Context.create()) {
                 Value value = context.eval(Source.newBuilder("js", new File("src/main/java/com/jbunce/analizadorlexico/analizers/semantic/main.js")).build());
-                log.info(value.asString());
+                // Restaurar la salida estándar original
+                System.out.flush();
+                System.setOut(old);
+
+                // Convertir la salida de la consola capturada a una cadena
+                String output = baos.toString();
+
+                // Imprimir la salida de la consola capturada
+                log.info("> " + output);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -239,5 +267,14 @@ public class HelloController implements Initializable {
         jflex.Main.generate(new String[]{lexerPath});
         jflex.Main.generate(new String[]{tableLexerPath});
         jflex.Main.generate(new String[]{semantic});
+    }
+
+    private static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
+        return new PrintStream(realPrintStream) {
+            public void print(final String string) {
+                realPrintStream.print(string);
+                log.info(string);
+            }
+        };
     }
 }

@@ -11,7 +11,10 @@ public class SemanticToken {
         DECLARATION,
         DECLARATION_ASIGN,
         FOR,
-        FUNCTION
+        FUNCTION,
+        FUNCTION_CALL,
+        IF,
+        ELSE,
     }
 
     private String token;

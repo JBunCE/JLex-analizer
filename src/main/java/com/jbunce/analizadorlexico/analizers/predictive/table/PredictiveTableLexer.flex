@@ -9,7 +9,16 @@ import com.jbunce.analizadorlexico.analizers.Tokens;
 L=[a-zA-Z]
 D=[0-9]+
 space=[\t \r \n]+
-console=(console\.log\(\"hello\"\))
+
+semicolon=(;)
+openP=(\()
+closeP=(\))
+name=({L}+|({L}{D})+)
+
+console=(console\.log\(\"{name}\"\))
+consolebye=(console\.log\(\"{name}\"\))
+functionCall=({name}{openP}{closeP}{semicolon})
+
 
 %{
     public String lexeme;
@@ -25,6 +34,8 @@ to { lexeme = yytext(); return Tokens.TO; }
 {space} { /* ignore */ }
 "//".* { /* ignore */ }
 {console} { /* ignore */ }
+{consolebye} { /* ignore */ }
+{functionCall} { /* ignore */ }
 
 "true" | "false" { lexeme = yytext(); return Tokens.BOOLEAN; }
 "int" | "float" | "string" | "bool" { lexeme = yytext(); return Tokens.TYPE; }

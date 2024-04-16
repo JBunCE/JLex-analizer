@@ -364,11 +364,11 @@ public class PredictiveTableAlg {
         table.get("IFR").put(Tokens.IF, new Production[]{I, IFPI, MAYK, ELSE});
 
         table.put("S", new HashMap<>());
-        table.get("S").put(Tokens.IF, new Production[]{IFR});
-        table.get("S").put(Tokens.FOR, new Production[]{FR});
-        table.get("S").put(Tokens.TYPE, new Production[]{Type, ISVAR});
-        table.get("S").put(Tokens.VOID_VALUE, new Production[]{FPI, FPR});
-        table.get("S").put(Tokens.NON_SPECIFIC, new Production[]{N, SC});
+        table.get("S").put(Tokens.IF, new Production[]{IFR, INITIAL_PRODUCTION});
+        table.get("S").put(Tokens.FOR, new Production[]{FR, INITIAL_PRODUCTION});
+        table.get("S").put(Tokens.TYPE, new Production[]{Type, ISVAR, INITIAL_PRODUCTION});
+        table.get("S").put(Tokens.VOID_VALUE, new Production[]{FPI, FPR, INITIAL_PRODUCTION});
+        table.get("S").put(Tokens.NON_SPECIFIC, new Production[]{N, SC, INITIAL_PRODUCTION});
 
         return table;
     }

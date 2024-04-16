@@ -1,1 +1,28 @@
-else
+// EXAMPLES
+
+// variable declaration
+int > y = 2;
+int > y;
+
+// for loop
+int > y = 20;
+
+for (x to y) > {
+    console.log("yaqueseacabeesto");
+}
+
+// functions
+int < funcion() {
+    console.log("mocos")
+}
+
+funcion();
+
+// if else
+int > y = 2;
+
+if (y != 2) > {
+	console.log("hello")
+}else > {
+	console.log("bye")
+}

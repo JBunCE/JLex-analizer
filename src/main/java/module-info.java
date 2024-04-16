@@ -15,6 +15,7 @@ module com.jbunce.analizadorlexico {
     requires org.slf4j;
     requires jflex;
     requires org.graalvm.sdk;
+    requires java.logging;
 
     opens com.jbunce.analizadorlexico to javafx.fxml;
 

@@ -1,8 +1,5 @@
 package com.jbunce.analizadorlexico.analizers.semantic;
 
-import com.jbunce.analizadorlexico.analizers.Tokens;
-import com.jbunce.analizadorlexico.analizers.lexical.Lexer;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
